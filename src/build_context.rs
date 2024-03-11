@@ -1,23 +1,23 @@
-use crate::auditwheel::{AuditWheelMode, get_policy_and_libs, patchelf, relpath};
+use crate::auditwheel::{get_policy_and_libs, patchelf, relpath, AuditWheelMode};
 use crate::auditwheel::{PlatformTag, Policy};
 use crate::binding_generator::{
-    CffiBindingGenerator, Pyo3BindingGenerator, generate_binding, write_bin, write_uniffi_module,
-    write_wasm_launcher,
+    generate_binding, write_bin, write_uniffi_module, write_wasm_launcher, CffiBindingGenerator,
+    Pyo3BindingGenerator,
 };
 use crate::bridge::Abi3Version;
 use crate::build_options::CargoOptions;
-use crate::compile::{CompileTarget, warn_missing_py_init};
+use crate::compile::{warn_missing_py_init, CompileTarget};
 use crate::compression::CompressionOptions;
-use crate::module_writer::{ModuleWriterExt, WheelWriter, add_data, write_python_part};
+use crate::module_writer::{add_data, write_python_part, ModuleWriterExt, WheelWriter};
 use crate::project_layout::ProjectLayout;
 use crate::source_distribution::source_distribution;
 use crate::target::validate_wheel_filename_for_pypi;
 use crate::target::{Arch, Os};
 use crate::{
-    BridgeModel, BuildArtifact, Metadata24, PyProjectToml, PythonInterpreter, Target, compile,
-    pyproject_toml::Format,
+    compile, pyproject_toml::Format, BridgeModel, BuildArtifact, Metadata24, PyProjectToml,
+    PythonInterpreter, Target,
 };
-use anyhow::{Context, Result, anyhow, bail};
+use anyhow::{anyhow, bail, Context, Result};
 use cargo_metadata::CrateType;
 use cargo_metadata::Metadata;
 use fs_err as fs;
@@ -138,6 +138,8 @@ pub struct BuildContext {
     pub compression: CompressionOptions,
     /// Whether to validate wheels against PyPI platform tag rules
     pub pypi_validation: bool,
+    /// Generate type stubs by introspecting the built libraries (PyO3 only)
+    pub introspect_stubs: bool,
 }
 
 /// The wheel file location and its Python version tag (e.g. `py3`).
@@ -776,6 +778,7 @@ impl BuildContext {
             self,
             self.interpreter.first(),
             &artifact,
+            self.introspect_stubs,
         )
         .context("Failed to add the files to the wheel")?;
 
@@ -857,6 +860,7 @@ impl BuildContext {
             self,
             Some(python_interpreter),
             &artifact,
+            self.introspect_stubs,
         )
         .context("Failed to add the files to the wheel")?;
 
@@ -983,6 +987,7 @@ impl BuildContext {
             self,
             self.interpreter.first(),
             &artifact,
+            self.introspect_stubs,
         )?;
 
         self.add_pth(&mut writer)?;

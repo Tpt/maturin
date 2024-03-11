@@ -225,6 +225,10 @@ pub struct BuildOptions {
     /// Wheel compression options
     #[command(flatten)]
     pub compression: CompressionOptions,
+
+    /// Auto generate Python type stubs by introspecting the binary. Requires PyO3 and its "experimental-inspect" feature
+    #[arg(long, hide = true)]
+    pub introspect_stubs: bool,
 }
 
 impl Deref for BuildOptions {
@@ -843,6 +847,7 @@ impl BuildContextBuilder {
             cargo_options,
             compression: build_options.compression,
             pypi_validation,
+            introspect_stubs: build_options.introspect_stubs,
         })
     }
 }

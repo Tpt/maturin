@@ -22,6 +22,7 @@ pub fn test_integration(
     bindings: Option<String>,
     unique_name: &str,
     zig: bool,
+    introspect_stubs: bool,
     target: Option<&str>,
 ) -> Result<()> {
     maybe_mock_cargo();
@@ -133,6 +134,10 @@ pub fn test_integration(
         file.unlock()?;
         cli.push("--interpreter".into());
         cli.push(python.as_os_str().to_owned());
+    }
+
+    if introspect_stubs {
+        cli.push("--introspect-stubs".into());
     }
 
     let options: BuildOptions = BuildOptions::try_parse_from(cli)?;

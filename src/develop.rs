@@ -235,6 +235,10 @@ pub struct DevelopOptions {
     /// Wheel compression options
     #[command(flatten)]
     pub compression: CompressionOptions,
+
+    /// Auto generate Python type stubs by introspecting the binary. Requires PyO3 and its "experimental-inspect" feature
+    #[arg(long, hide = true)]
+    pub introspect_stubs: bool,
 }
 
 #[instrument(skip_all)]
@@ -394,6 +398,7 @@ pub fn develop(develop_options: DevelopOptions, venv_dir: &Path) -> Result<()> {
         mut cargo_options,
         uv,
         compression,
+        introspect_stubs,
     } = develop_options;
     compression.validate();
 
@@ -431,6 +436,7 @@ pub fn develop(develop_options: DevelopOptions, venv_dir: &Path) -> Result<()> {
             ..cargo_options
         },
         compression,
+        introspect_stubs,
     };
 
     let build_context = build_options

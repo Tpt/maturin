@@ -7,17 +7,19 @@ use anyhow::Context as _;
 use anyhow::Result;
 use fs_err as fs;
 use fs_err::File;
-use tempfile::TempDir;
+use pyo3_introspection::introspect_cdylib;
+use pyo3_introspection::module_stub_files;
 use tempfile::tempdir;
+use tempfile::TempDir;
 use tracing::debug;
 
+use crate::module_writer::write_python_part;
+use crate::module_writer::ModuleWriterExt;
 use crate::BuildArtifact;
 use crate::BuildContext;
 use crate::Metadata24;
 use crate::ModuleWriter;
 use crate::PythonInterpreter;
-use crate::module_writer::ModuleWriterExt;
-use crate::module_writer::write_python_part;
 
 mod cffi_binding;
 mod pyo3_binding;
@@ -84,6 +86,7 @@ pub fn generate_binding(
     context: &BuildContext,
     interpreter: Option<&PythonInterpreter>,
     artifact: &BuildArtifact,
+    introspect_stubs: bool,
 ) -> Result<()> {
     // 1. Install the python files
     if !context.editable {
@@ -182,6 +185,13 @@ pub fn generate_binding(
         if type_stub.exists() {
             eprintln!("📖 Found type stub file at {ext_name}.pyi");
             writer.add_file(module.join("__init__.pyi"), type_stub, false)?;
+            writer.add_empty_file(module.join("py.typed"))?;
+        } else if introspect_stubs {
+            let module_introspection= introspect_cdylib(&artifact.path, ext_name).context("Failed to introspect the built libraries to generate type stubs, have you enabled the \"experimental-inspect\" feature?")?;
+            eprintln!("📖 Type stub extracted from the built binary");
+            for (path, stub_content) in &module_stub_files(&module_introspection) {
+                writer.add_bytes(module.join(path), None, stub_content.as_bytes(), false)?;
+            }
             writer.add_empty_file(module.join("py.typed"))?;
         }
     }

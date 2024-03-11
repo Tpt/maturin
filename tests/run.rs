@@ -268,6 +268,7 @@ fn integration_pyo3_bin() {
         None,
         "integration-pyo3-bin",
         false,
+        false,
         None,
     ));
 }
@@ -278,6 +279,7 @@ fn integration_pyo3_pure() {
         "test-crates/pyo3-pure",
         None,
         "integration-pyo3-pure",
+        false,
         false,
         None,
     ));
@@ -290,6 +292,7 @@ fn integration_pyo3_mixed() {
         None,
         "integration-pyo3-mixed",
         false,
+        false,
         None,
     ));
 }
@@ -300,6 +303,7 @@ fn integration_pyo3_mixed_include_exclude() {
         "test-crates/pyo3-mixed-include-exclude",
         None,
         "integration-pyo3-mixed-include-exclude",
+        false,
         false,
         None,
     ));
@@ -312,6 +316,7 @@ fn integration_pyo3_mixed_submodule() {
         None,
         "integration-pyo3-mixed-submodule",
         false,
+        false,
         None,
     ));
 }
@@ -322,6 +327,7 @@ fn integration_pyo3_mixed_with_path_dep() {
         "test-crates/pyo3-mixed-with-path-dep",
         None,
         "integration-pyo3-mixed-with-path-dep",
+        false,
         false,
         None,
     ));
@@ -334,6 +340,7 @@ fn integration_pyo3_mixed_implicit() {
         None,
         "integration-pyo3-mixed-implicit",
         false,
+        false,
         None,
     ));
 }
@@ -345,6 +352,7 @@ fn integration_pyo3_mixed_py_subdir() {
         None,
         "integration-pyo3-mixed-py-subdir",
         cfg!(unix),
+        false,
         None,
     ));
 }
@@ -355,6 +363,7 @@ fn integration_pyo3_mixed_src_layout() {
         "test-crates/pyo3-mixed-src/rust",
         None,
         "integration-pyo3-mixed-src",
+        false,
         false,
         None,
     ));
@@ -383,6 +392,7 @@ fn integration_cffi_pure() {
         None,
         "integration-cffi-pure",
         false,
+        false,
         None,
     ));
 }
@@ -399,6 +409,7 @@ fn integration_cffi_mixed() {
         None,
         "integration-cffi-mixed",
         false,
+        false,
         None,
     ));
 }
@@ -410,6 +421,7 @@ fn integration_uniffi_pure() {
             "test-crates/uniffi-pure",
             None,
             "integration-uniffi-pure",
+            false,
             false,
             None,
         ));
@@ -423,6 +435,7 @@ fn integration_uniffi_pure_proc_macro() {
         None,
         "integration-uniffi-pure-proc-macro",
         false,
+        false,
         None,
     ));
 }
@@ -434,6 +447,7 @@ fn integration_uniffi_mixed() {
             "test-crates/uniffi-mixed",
             None,
             "integration-uniffi-mixed",
+            false,
             false,
             None,
         ));
@@ -447,6 +461,7 @@ fn integration_hello_world() {
         None,
         "integration-hello-world",
         false,
+        false,
         None,
     ));
 }
@@ -457,6 +472,7 @@ fn integration_pyo3_ffi_pure() {
         "test-crates/pyo3-ffi-pure",
         None,
         "integration-pyo3-ffi-pure",
+        false,
         false,
         None,
     ));
@@ -469,6 +485,7 @@ fn integration_with_data() {
         None,
         "integration-with-data",
         false,
+        false,
         None,
     ));
 }
@@ -480,6 +497,7 @@ fn integration_readme_duplication() {
         None,
         "integration-readme-duplication",
         false,
+        false,
         None,
     ));
 }
@@ -490,6 +508,7 @@ fn integration_workspace_inverted_order() {
         "test-crates/workspace-inverted-order/path-dep-with-root",
         None,
         "integration-workspace-inverted-order",
+        false,
         false,
         None,
     ));
@@ -518,6 +537,7 @@ fn integration_wasm_hello_world() {
         None,
         "integration-wasm-hello-world",
         false,
+        false,
         Some("wasm32-wasip1"),
     ));
 
@@ -538,6 +558,18 @@ fn integration_wasm_hello_world() {
             .join("hello-world.wasm")
             .is_file()
     )
+}
+
+#[test]
+fn integration_pyo3_stub_generation() {
+    handle_result(integration::test_integration(
+        "test-crates/pyo3-stub-generation",
+        None,
+        "integration-pyo3-stub-generation",
+        false,
+        true,
+        None,
+    ));
 }
 
 #[test]
