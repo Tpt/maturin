@@ -28,6 +28,7 @@ pub use crate::build_options::{BuildOptions, CargoOptions};
 pub use crate::cargo_toml::CargoToml;
 pub use crate::compile::{compile, BuildArtifact};
 pub use crate::develop::{develop, DevelopOptions};
+pub use crate::introspect::introspect_stubs;
 pub use crate::metadata::{Metadata23, WheelMetadata};
 pub use crate::module_writer::{
     write_dist_info, ModuleWriter, PathWriter, SDistWriter, WheelWriter,
@@ -51,6 +52,7 @@ pub mod ci;
 mod compile;
 mod cross_compile;
 mod develop;
+mod introspect;
 mod metadata;
 mod module_writer;
 #[cfg(feature = "scaffolding")]

@@ -849,3 +849,11 @@ fn pyo3_source_date_epoch() {
         "pyo3_source_date_epoch",
     ))
 }
+
+#[test]
+fn introspect_stubs_pyo3_stub_generation() {
+    handle_result(other::test_introspect_stubs(
+        "test-crates/pyo3-stub-generation",
+        "Hello, world!",
+    ));
+}

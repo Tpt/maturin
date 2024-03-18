@@ -85,6 +85,7 @@ pep508_rs = { version = "0.4.2", features = ["serde", "tracing"] }
 time = "0.3.17"
 url = "2.5.0"
 unicode-xid = { version = "0.2.4", optional = true }
+libloading = "0.8"
 
 # cli
 clap = { version = "4.0.0", features = [

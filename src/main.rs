@@ -13,13 +13,14 @@ use clap::{Parser, Subcommand};
 #[cfg(feature = "scaffolding")]
 use maturin::{ci::GenerateCI, init_project, new_project, GenerateProjectOptions};
 use maturin::{
-    develop, write_dist_info, BridgeModel, BuildOptions, CargoOptions, DevelopOptions, PathWriter,
-    PlatformTag, PythonInterpreter, Target,
+    develop, introspect_stubs, write_dist_info, BridgeModel, BuildOptions, CargoOptions,
+    DevelopOptions, PathWriter, PlatformTag, PythonInterpreter, Target,
 };
 #[cfg(feature = "upload")]
 use maturin::{upload_ui, PublishOpt};
-use std::env;
+use std::io::{stdout, Write};
 use std::path::PathBuf;
+use std::{env, fs};
 use tracing::debug;
 
 #[derive(Debug, Parser)]
@@ -141,6 +142,13 @@ enum Opt {
     #[cfg(feature = "zig")]
     #[command(subcommand, hide = true)]
     Zig(Zig),
+    /// Introspect PyO3 macros to autogenerate type stubs
+    IntrospectStubs {
+        /// The file where stubs should be written (by default stdout)
+        output: Option<PathBuf>,
+        #[command(flatten)]
+        build: BuildOptions,
+    },
 }
 
 /// Backend for the PEP 517 integration. Not for human consumption
@@ -424,6 +432,17 @@ fn run() -> Result<()> {
             subcommand
                 .execute()
                 .context("Failed to run zig linker wrapper")?;
+        }
+        Opt::IntrospectStubs { output, build } => {
+            let stubs = introspect_stubs(build)?;
+            if let Some(output) = output {
+                fs::write(&output, stubs)
+                    .with_context(|| format!("Failed to write stubs to {}", output.display()))?;
+            } else {
+                stdout()
+                    .write_all(stubs.as_bytes())
+                    .context("Failed to print stubs")?;
+            }
         }
     }
 

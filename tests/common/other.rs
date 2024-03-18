@@ -3,7 +3,7 @@ use clap::Parser;
 use expect_test::Expect;
 use flate2::read::GzDecoder;
 use maturin::pyproject_toml::{SdistGenerator, ToolMaturin};
-use maturin::{BuildOptions, CargoOptions, PlatformTag};
+use maturin::{introspect_stubs, BuildOptions, CargoOptions, PlatformTag};
 use pretty_assertions::assert_eq;
 use std::collections::BTreeSet;
 use std::fs::File;
@@ -302,5 +302,21 @@ pub fn abi3_python_interpreter_args() -> Result<()> {
         assert!(result.is_err());
     }
 
+    Ok(())
+}
+
+pub fn test_introspect_stubs(package: impl AsRef<Path>, expected_stubs: &str) -> Result<()> {
+    let manifest_path = package.as_ref().join("Cargo.toml");
+    let build_options = BuildOptions {
+        out: None,
+        cargo: CargoOptions {
+            manifest_path: Some(manifest_path),
+            quiet: true,
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+
+    assert_eq!(expected_stubs, introspect_stubs(build_options)?);
     Ok(())
 }
